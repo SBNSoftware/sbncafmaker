@@ -19,7 +19,7 @@
 #include "lardataobj/AnalysisBase/T0.h"
 #include "lardataobj/RecoBase/PFParticleMetadata.h"
 #include "lardataobj/RecoBase/MCSFitResult.h"
-#include "sbncafmaker/LArRecoProducer/RangeP.h"
+#include "sbncafmaker/LArRecoProducer/Products/RangeP.h"
 
 #include "sbncafmaker/StandardRecord/SRSlice.h"
 #include "sbncafmaker/StandardRecord/StandardRecord.h"
