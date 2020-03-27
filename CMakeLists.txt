@@ -63,7 +63,6 @@ include(BuildPlugins)
 add_subdirectory(sbncafmaker)
 add_subdirectory(ups)
 add_subdirectory(fcl)
-#add_subdirectory(bin)
 
 # packaging utility
 include(UseCPack)
