@@ -95,7 +95,7 @@
 #include "larcoreobj/SummaryData/POTSummary.h"
 
 // StandardRecord
-#include "sbncafmaker/StandardRecord/StandardRecord.h"
+#include "sbnanaobj/StandardRecord/StandardRecord.h"
 
 // // CAFMaker
 #include "sbncafmaker/CAFMaker/AssociationUtil.h"
