@@ -13,14 +13,20 @@
 
 #include "calorimetry_sbnd.fcl"
 
+#include "trackscatterclosestapproach.fcl"
+#include "trackstoppingchi2fitter.fcl"
 #include "mcsproducer.fcl"
 #include "rangeproducer.fcl"
 #include "showerselectionvarsproducer.fcl"
+#include "showercosmicdistanceproducer.fcl"
+#include "sbn_pid.fcl"
+
 #include "crthitconverter_producer.fcl"
 #include "crtmatch_producer.fcl"
 #include "pmtflashtrigger_producer.fcl"
 
 #include "flashmatch_sbnd.fcl"
+#include "sbn_stub.fcl"
 
 
 process_name: CAFmaker
@@ -47,6 +53,7 @@ services:
   DetectorPropertiesService: @local::sbnd_detproperties
   ParticleInventoryService:  @local::standard_particleinventoryservice
   BackTrackerService:        @local::standard_backtrackerservice
+  SpaceCharge:               @local::sbnd_spacecharge
   NuRandomService: {
     policy: perEvent
   }
@@ -77,15 +84,24 @@ physics:
 #  slicer:               @local::standard_slicemergeviews
 #  cosmictrack:          @local::standard_cosmictrack         #reco
 #  windowtrack:          @local::window_cosmictrack           #reco
-   fmatchSCENew:           @local::sbnd_simple_flashmatch
 
    flashtrig: @local::pmtflashtrigmaker_sbnd
    pandoraTrackMCS:   @local::mcs_sbn
    pandoraTrackRange:   @local::range_sbn
-   pandoraShowerSelectionVars:  @local::showerSelectionVars_sbn
    crtconvhit:            @local::crthitconverter_sbnd
    pandoraTrackCRTHit:          @local::crthitmatch_sbnd
    pandoraTrackCRTTrack:  @local::crttrackmatch_sbnd
+
+   vertexCharge: @local::vertex_charge_sbnd
+   vertexStub: @local::vertex_stub_sbnd
+   pandoraTrackClosestApproach:          @local::trackscatterclosestapproach_sbn
+   pandoraTrackStoppingChi2: @local::trackstoppingchi2fitter_sbn
+   pandoraTrackDazzle:       @local::dazzle_sbnd
+
+   pandoraShowerSelectionVars:  @local::showerSelectionVars_sbn
+   pandoraShowerCosmicDist: @local::showerCosmicDist_sbn
+   pandoraShowerRazzle:         @local::razzle_sbnd
+
    rns: { module_type: "RandomNumberSaver" }
    genieweight: @local::sbn_genie_eventweight
 }
@@ -96,9 +112,10 @@ physics:
   {
 #    metadata: @local::standard_metadata            #prod
   }
- runprod: [ flashtrig, flashtrigfilter, pandoraTrackMCS, pandoraTrackRange, pandoraShowerSelectionVars,
-            pandoraTrackCRTHit, pandoraTrackCRTTrack, fmatchSCENew,
-            rns, genieweight,
+ runprod: [ pandoraTrackMCS, pandoraTrackRange, pandoraShowerSelectionVars,
+            pandoraTrackCRTHit, pandoraTrackCRTTrack, vertexCharge, vertexStub,
+            pandoraTrackClosestApproach, pandoraTrackStoppingChi2, pandoraTrackDazzle,
+            pandoraShowerCosmicDist, pandoraShowerRazzle,
             mycafmaker ]
 # makecaf: [mycafmaker] #list the modules for this path, order matters, filters reject all following items
 # stream1: [metadata]
@@ -109,12 +126,14 @@ physics:
 
 }
 
+physics.producers.vertexCharge.CaloAlg: @local::sbnd_calorimetryalgmc
+physics.producers.vertexStub.CaloAlg: @local::sbnd_calorimetryalgmc
+
 physics.producers.mycafmaker: @local::standard_cafmaker
-physics.producers.mycafmaker.CalorimetryConstants: @local::sbnd_calorimetryalgmc.CalAreaConstants
 physics.producers.mycafmaker.CosmicGenLabel: "corsika"
 
-physics.producers.genieweight.weight_functions: @local::physics.producers.genieweight.weight_functions_genie
+# This job doesn't run the genie weights, and we assume they won't be in the
+# input art file.
+physics.producers.mycafmaker.SystWeightLabels: []
 
-# Ensure CAFMaker is configured to pick up the weights we just produced, no
-# matter what the default configuration is.
-physics.producers.mycafmaker.SystWeightLabel: "genieweight"
+services.BackTrackerService.BackTracker.SimChannelModuleLabel: "simdrift"
