@@ -6,3 +6,4 @@ cet_find_library( WDA NAMES wda PATHS ENV LIBWDA_LIB NO_DEFAULT_PATH )
 find_ups_product(sbnanaobj)
 
 add_subdirectory(CAFMaker)
+add_subdirectory(Metadata)
